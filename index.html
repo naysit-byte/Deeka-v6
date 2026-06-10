@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#c8960c"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ค้นฎีกา"/>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="apple-touch-icon" href="./icons/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-192.png"/>
+<title>ค้นฎีกา</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0c0c0c;
+  --card:#141414;
+  --card2:#1a1a1a;
+  --line:#242424;
+  --line2:#2e2e2e;
+  --gold:#c8960c;
+  --gold-light:#e8b020;
+  --gold-bg:#0f0b00;
+  --gold-border:#5a4006;
+  --text:#e8e4dc;
+  --sub:#666;
+  --mute:#333;
+  --green:#22c55e;
+  --green-bg:#021a08;
+  --green-border:#0f4020;
+  --r:10px;
+  --r-sm:6px;
+}
+
+html,body{
+  height:100%;background:var(--bg);color:var(--text);
+  font-family:'Sarabun','Noto Sans Thai',sans-serif;
+  font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Layout ── */
+.app{display:flex;flex-direction:column;min-height:100vh;max-width:560px;margin:0 auto}
+
+/* ── Header ── */
+header{
+  padding:14px 20px 12px;
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px;
+  position:sticky;top:0;background:var(--bg);z-index:10;
+}
+.emblem{
+  width:30px;height:30px;border-radius:7px;
+  background:linear-gradient(135deg,#8a6408,var(--gold-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+header h1{font-size:15px;font-weight:700;letter-spacing:.01em}
+header p{font-size:11px;color:var(--sub);margin-top:1px}
+#btn-install{
+  margin-left:auto;padding:5px 11px;border-radius:var(--r-sm);
+  background:var(--gold-bg);border:1px solid var(--gold-border);
+  color:var(--gold);font-family:inherit;font-size:11px;font-weight:700;
+  cursor:pointer;display:none;white-space:nowrap;
+}
+#btn-install.show{display:block}
+
+/* ── Main ── */
+main{flex:1;padding:20px}
+
+/* ── Section label ── */
+.label{
+  font-size:10px;font-weight:700;color:var(--sub);
+  letter-spacing:.1em;margin-bottom:8px;
+}
+
+/* ── Search ── */
+.search-wrap{
+  display:flex;gap:8px;margin-bottom:8px;
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:var(--r);padding:10px 12px;
+  transition:border-color .15s;
+}
+.search-wrap:focus-within{border-color:var(--gold-border)}
+.search-wrap input{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--text);font-family:inherit;font-size:16px;
+}
+.search-wrap input::placeholder{color:var(--mute)}
+.btn-open{
+  flex-shrink:0;padding:8px 16px;
+  background:var(--gold);color:#000;
+  border:none;border-radius:var(--r-sm);
+  font-family:inherit;font-size:13px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.btn-open:hover{background:var(--gold-light)}
+.btn-open:disabled{background:var(--mute);color:var(--sub);cursor:default}
+
+/* ── Chips ── */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px}
+.chip{
+  padding:4px 10px;border-radius:12px;
+  border:1px solid var(--line2);background:none;
+  color:var(--sub);font-family:inherit;font-size:12px;
+  cursor:pointer;transition:all .15s;
+}
+.chip:hover{border-color:var(--gold-border);color:var(--gold);background:var(--gold-bg)}
+
+/* ── Divider ── */
+.divider{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
+.divider span{font-size:11px;color:var(--sub);white-space:nowrap}
+
+/* ── Paste area ── */
+.paste-card{
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:var(--r);overflow:hidden;margin-bottom:8px;
+  transition:border-color .15s;
+}
+.paste-card:focus-within{border-color:var(--line2)}
+.paste-card textarea{
+  width:100%;min-height:130px;padding:13px 14px;
+  background:none;border:none;outline:none;
+  color:var(--text);font-family:inherit;font-size:13px;
+  line-height:1.8;resize:none;
+}
+.paste-card textarea::placeholder{color:var(--mute)}
+.paste-footer{
+  padding:8px 12px;border-top:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);
+}
+.paste-meta{font-size:11px;color:var(--sub);flex:1}
+.paste-meta span{color:var(--text);font-weight:600}
+.btn-sm{
+  padding:5px 10px;border-radius:var(--r-sm);
+  border:1px solid var(--line2);background:none;
+  color:var(--sub);font-family:inherit;font-size:11px;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-sm:hover{border-color:var(--gold-border);color:var(--gold)}
+
+/* Auto-detect tags */
+.auto-tags{display:flex;flex-wrap:wrap;gap:5px;min-height:4px;margin-bottom:12px}
+.atag{
+  padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700;
+}
+.atag-deka{background:var(--gold-bg);border:1px solid var(--gold-border);color:var(--gold)}
+.atag-law{background:#061422;border:1px solid #0e2a40;color:#5b9bd5}
+
+/* ── Send to Claude ── */
+.send-card{
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:var(--r);overflow:hidden;
+}
+.send-card-body{padding:14px}
+.send-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.send-desc{font-size:12px;color:var(--sub);margin-bottom:12px;line-height:1.6}
+
+.btn-send{
+  width:100%;padding:12px;border:none;border-radius:var(--r-sm);
+  font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .15s;
+}
+.btn-send-primary{
+  background:linear-gradient(135deg,#c8960c,#e8b020);color:#000;
+}
+.btn-send-primary:hover{background:linear-gradient(135deg,#e8b020,#f0c030)}
+.btn-send-primary:disabled{
+  background:var(--mute);color:var(--sub);cursor:default;
+}
+.btn-send-copy{
+  background:none;border:1px solid var(--line2);color:var(--sub);
+  margin-top:7px;font-size:13px;
+}
+.btn-send-copy:hover{border-color:var(--gold-border);color:var(--gold)}
+.btn-send-copy:disabled{opacity:.3;cursor:default}
+
+/* Ready state */
+.ready-pill{
+  display:none;align-items:center;gap:7px;
+  padding:8px 12px;border-radius:var(--r-sm);
+  background:var(--green-bg);border:1px solid var(--green-border);
+  font-size:12px;color:var(--green);margin-bottom:10px;
+}
+.ready-pill.show{display:flex}
+.ready-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+
+/* ── Saved keywords ── */
+.saved-section{margin-top:24px}
+.saved-row{display:flex;gap:8px;margin-bottom:8px}
+.saved-row input{
+  flex:1;padding:8px 12px;background:var(--card);
+  border:1px solid var(--line2);border-radius:var(--r-sm);
+  color:var(--text);font-family:inherit;font-size:13px;outline:none;
+  transition:border-color .15s;
+}
+.saved-row input:focus{border-color:var(--gold-border)}
+.saved-row input::placeholder{color:var(--mute)}
+.saved-chips{display:flex;flex-wrap:wrap;gap:5px}
+.saved-chip{
+  display:flex;align-items:center;gap:4px;
+  padding:4px 8px 4px 10px;border-radius:12px;
+  border:1px solid var(--line2);background:var(--card);
+  color:var(--sub);font-size:12px;
+}
+.saved-chip-kw{cursor:pointer;transition:color .15s}
+.saved-chip-kw:hover{color:var(--gold)}
+.saved-chip-del{
+  background:none;border:none;color:var(--mute);
+  cursor:pointer;font-size:13px;line-height:1;padding:0 1px;
+  transition:color .15s;
+}
+.saved-chip-del:hover{color:#e74c3c}
+
+/* ── Toast ── */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--card2);border:1px solid var(--line2);
+  color:var(--text);font-size:13px;padding:9px 16px;
+  border-radius:20px;z-index:999;opacity:0;
+  transition:opacity .2s;pointer-events:none;white-space:nowrap;
+}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="emblem">⚖️</div>
+  <div>
+    <h1>ค้นฎีกา</h1>
+    <p>deka.supremecourt.or.th</p>
+  </div>
+  <button id="btn-install" onclick="installApp()">📲 ติดตั้ง</button>
+</header>
+
+<main>
+
+  <!-- Step 1: ค้นหา -->
+  <div class="label">1 — ค้นหาในเว็บฎีกา</div>
+  <div class="search-wrap">
+    <input id="kw" placeholder="เช่น ลักทรัพย์ เจตนาทุจริต" autocomplete="off"/>
+    <button class="btn-open" id="btn-open" onclick="openDeka()">เปิดเว็บ →</button>
+  </div>
+  <div class="chips" id="chips"></div>
+
+  <div class="divider"><span>2 — วางเนื้อหาคำพิพากษา</span></div>
+
+  <!-- Step 2: วาง -->
+  <div class="paste-card">
+    <textarea id="pa" placeholder="copy คำพิพากษาจากเว็บฎีกา แล้ววางที่นี่..." oninput="onPaste()"></textarea>
+    <div class="paste-footer">
+      <span class="paste-meta">
+        <span id="char-count">0</span> ตัวอักษร
+      </span>
+      <button class="btn-sm" onclick="doPaste()">📋 วาง</button>
+      <button class="btn-sm" onclick="clearPaste()">ล้าง</button>
+    </div>
+  </div>
+  <div class="auto-tags" id="auto-tags"></div>
+
+  <!-- Step 3: ส่งให้ Claude -->
+  <div class="divider"><span>3 — ส่งให้ Claude สรุป</span></div>
+
+  <div class="send-card">
+    <div class="send-card-body">
+      <div class="ready-pill" id="ready-pill">
+        <div class="ready-dot"></div>
+        <span>พร้อมส่งให้ Claude แล้ว</span>
+      </div>
+      <div class="send-title">ส่งคำพิพากษาให้ Claude สรุป</div>
+      <div class="send-desc">
+        กด "ส่งให้ Claude" — จะเปิด claude.ai ในแท็บใหม่พร้อม prompt สรุปหลักกฎหมายอัตโนมัติ<br>
+        ไม่เสีย token เพิ่ม รวมอยู่ใน subscription แล้ว
+      </div>
+      <button class="btn-send btn-send-primary" id="btn-send" onclick="sendToClaude()" disabled>
+        ✦ ส่งให้ Claude สรุป
+      </button>
+      <button class="btn-send btn-send-copy" id="btn-copy-prompt" onclick="copyPrompt()" disabled>
+        📋 copy prompt ไปวางเอง
+      </button>
+    </div>
+  </div>
+
+  <!-- Saved keywords -->
+  <div class="saved-section">
+    <div class="label">คำค้นที่ใช้บ่อย</div>
+    <div class="saved-row">
+      <input id="saved-in" placeholder="เพิ่มคำค้น..."/>
+      <button class="btn-sm" style="padding:8px 12px" onclick="addSaved()">+ เพิ่ม</button>
+    </div>
+    <div class="saved-chips" id="saved-chips"></div>
+  </div>
+
+</main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── Data ──────────────────────────────────────────────
+const QUICK = [
+  'ลักทรัพย์ เจตนาทุจริต',
+  'หมิ่นประมาท ร้องเรียน',
+  'มาตรา 329 สุจริต',
+  'ฉ้อโกง เจตนา',
+  'บุกรุก เคหสถาน',
+  'ยาเสพติด ครอบครอง',
+];
+
+let saved = JSON.parse(localStorage.getItem('dk_saved') || '[]');
+let pasteContent = '';
+
+// ── Init ──────────────────────────────────────────────
+document.getElementById('kw').value = '';
+document.getElementById('pa').value = '';
+renderChips();
+renderSaved();
+
+// ── Chips ──────────────────────────────────────────────
+function renderChips() {
+  const el = document.getElementById('chips');
+  el.innerHTML = [...QUICK, ...saved.filter(s => !QUICK.includes(s))]
+    .map(k => `<button class="chip" onclick="setKw(${JSON.stringify(k)})">${k}</button>`)
+    .join('');
+}
+
+function setKw(k) {
+  document.getElementById('kw').value = k;
+  document.getElementById('kw').focus();
+}
+
+// ── Step 1: Open deka ──────────────────────────────────
+function openDeka() {
+  const kw = document.getElementById('kw').value.trim();
+  if (!kw) { toast('กรุณากรอกคำค้นหา'); return; }
+  // copy คำค้นไป clipboard
+  if (navigator.clipboard) navigator.clipboard.writeText(kw).catch(() => {});
+  // เปิดเว็บฎีกาหน้าแรก + timestamp
+  window.open('https://deka.supremecourt.or.th?_t=' + Date.now(), '_blank', 'noopener');
+  toast('"' + kw + '" — copy แล้ว วาง Paste ในเว็บฎีกาได้เลย');
+}
+
+// ── Step 2: Paste ──────────────────────────────────────
+function onPaste() {
+  const txt = document.getElementById('pa').value;
+  pasteContent = txt;
+  document.getElementById('char-count').textContent = txt.length.toLocaleString();
+  autoDetect(txt);
+  const hasContent = txt.trim().length > 50;
+  document.getElementById('btn-send').disabled = !hasContent;
+  document.getElementById('btn-copy-prompt').disabled = !hasContent;
+  document.getElementById('ready-pill').classList.toggle('show', hasContent);
+}
+
+async function doPaste() {
+  try {
+    const t = await navigator.clipboard.readText();
+    document.getElementById('pa').value = t;
+    onPaste();
+    toast('วางแล้ว');
+  } catch {
+    toast('กรุณา Paste ด้วยตนเอง (long-press)');
+  }
+}
+
+function clearPaste() {
+  document.getElementById('pa').value = '';
+  pasteContent = '';
+  onPaste();
+}
+
+function autoDetect(txt) {
+  const tags = [];
+  const dekas = [...new Set(txt.match(/\d{1,5}\/\d{4}/g) || [])].slice(0, 3);
+  dekas.forEach(d => tags.push(`<span class="atag atag-deka">ฎีกา ${d}</span>`));
+  const laws = [...new Set([...txt.matchAll(/ม(?:าตรา)?\.?\s*(\d{1,3}(?:\(\d+\))?)/g)].map(m => 'ม.' + m[1]))].slice(0, 6);
+  laws.forEach(l => tags.push(`<span class="atag atag-law">${l}</span>`));
+  document.getElementById('auto-tags').innerHTML = tags.join('');
+}
+
+// ── Step 3: Send to Claude ─────────────────────────────
+function buildPrompt() {
+  const kw = document.getElementById('kw').value.trim();
+  const header = kw ? `คำค้น: ${kw}\n\n` : '';
+  return `${header}สรุปคำพิพากษาฎีกาต่อไปนี้ โดยระบุ:
+1. เลขฎีกาและปี
+2. ข้อเท็จจริงสำคัญ (2-3 ประโยค)
+3. หลักกฎหมายที่ศาลวางไว้
+4. ผลคดี (ลงโทษ/ยกฟ้อง/ส่งกลับ)
+5. มาตราที่เกี่ยวข้อง
+
+---
+${pasteContent}`;
+}
+
+function sendToClaude() {
+  if (!pasteContent.trim()) return;
+  const prompt = buildPrompt();
+  // encode ใน URL hash เพื่อให้ claude.ai รับได้
+  const encoded = encodeURIComponent(prompt);
+  // เปิด claude.ai พร้อม prompt — ผู้ใช้ paste เองใน claude.ai
+  // copy prompt ไป clipboard ก่อนเปิด
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(prompt).then(() => {
+      window.open('https://claude.ai/new', '_blank', 'noopener');
+      toast('copy prompt แล้ว — วางใน Claude ได้เลย');
+    }).catch(() => {
+      window.open('https://claude.ai/new', '_blank', 'noopener');
+      toast('เปิด Claude แล้ว — วาง prompt เอง');
+    });
+  } else {
+    window.open('https://claude.ai/new', '_blank', 'noopener');
+    toast('เปิด Claude แล้ว — ใช้ปุ่ม "copy prompt" วางเอง');
+  }
+}
+
+function copyPrompt() {
+  if (!pasteContent.trim()) return;
+  const prompt = buildPrompt();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(prompt).then(() => toast('copy prompt แล้ว — วางใน Claude ได้เลย'));
+  } else {
+    toast('browser นี้ไม่รองรับ copy อัตโนมัติ');
+  }
+}
+
+// ── Saved keywords ──────────────────────────────────────
+function addSaved() {
+  const v = document.getElementById('saved-in').value.trim();
+  if (!v) return;
+  if (saved.includes(v)) { toast('มีอยู่แล้ว'); return; }
+  saved.push(v);
+  localStorage.setItem('dk_saved', JSON.stringify(saved));
+  document.getElementById('saved-in').value = '';
+  renderSaved(); renderChips();
+  toast('เพิ่มแล้ว');
+}
+
+function delSaved(k) {
+  saved = saved.filter(s => s !== k);
+  localStorage.setItem('dk_saved', JSON.stringify(saved));
+  renderSaved(); renderChips();
+}
+
+function renderSaved() {
+  const el = document.getElementById('saved-chips');
+  if (!saved.length) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--mute)">ยังไม่มี — เพิ่มคำค้นที่ใช้บ่อยด้านบน</span>';
+    return;
+  }
+  el.innerHTML = saved.map(k => `
+    <div class="saved-chip">
+      <span class="saved-chip-kw" onclick="setKw(${JSON.stringify(k)})">${k}</span>
+      <button class="saved-chip-del" onclick="delSaved(${JSON.stringify(k)})">×</button>
+    </div>`).join('');
+}
+
+// ── PWA Install ────────────────────────────────────────
+let _prompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); _prompt = e;
+  document.getElementById('btn-install').classList.add('show');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('btn-install').classList.remove('show');
+  toast('ติดตั้งแอปสำเร็จ ✓');
+});
+function installApp() {
+  if (_prompt) {
+    _prompt.prompt();
+    _prompt.userChoice.then(() => { _prompt = null; document.getElementById('btn-install').classList.remove('show'); });
+  } else {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    alert(isIOS
+      ? 'ติดตั้งบน iOS:\n1. กดปุ่ม Share (□↑)\n2. เลือก "เพิ่มไปยังหน้าจอโฮม"\n3. กด "เพิ่ม"'
+      : 'ติดตั้งบน Android:\n1. กดเมนู ⋮ มุมขวาบน\n2. เลือก "เพิ่มในหน้าจอหลัก"\n3. กด "ติดตั้ง"');
+  }
+}
+setTimeout(() => {
+  if (!_prompt && !window.matchMedia('(display-mode:standalone)').matches)
+    document.getElementById('btn-install').classList.add('show');
+}, 3000);
+
+// ── Toast ──────────────────────────────────────────────
+let _tt;
+function toast(m) {
+  const el = document.getElementById('toast');
+  el.textContent = m; el.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ── Keyboard ───────────────────────────────────────────
+document.getElementById('kw').addEventListener('keydown', e => { if (e.key === 'Enter') openDeka(); });
+document.getElementById('saved-in').addEventListener('keydown', e => { if (e.key === 'Enter') addSaved(); });
+
+// ── Service Worker ─────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        // SW registered — ถ้ายังไม่ใช่ standalone mode ให้รอ install prompt
+        if (window.matchMedia('(display-mode: standalone)').matches) return;
+        // fallback: ถ้า beforeinstallprompt ไม่ fire ใน 4 วินาที แสดงปุ่มแนะนำ
+        setTimeout(() => {
+          if (!_prompt && !window.matchMedia('(display-mode: standalone)').matches) {
+            document.getElementById('btn-install').classList.add('show');
+          }
+        }, 4000);
+      })
+      .catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
